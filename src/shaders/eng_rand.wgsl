@@ -1,6 +1,8 @@
 //! ifndef _eng_rand_wgsl
 //! define _eng_rand_wgsl ""
 
+//! include "eng_header"
+
 var<private> seed: f32 = 0.0;
 
 fn _rand(_co: vec2<f32>) -> f32 {

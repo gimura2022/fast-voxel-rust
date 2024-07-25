@@ -65,7 +65,7 @@ struct TimeUniform {
 #[derive(Debug, Clone, Copy)]
 #[derive(Zeroable, Pod)]
 struct CameraMatrixUniform {
-    matrix: [f32; 4]
+    matrix: [[f32; 4]; 4]
 }
 
 #[repr(C)]
@@ -152,12 +152,7 @@ impl Render {
         };
 
         let camera_rot_uniform = CameraMatrixUniform {
-            matrix: [
-                desc.camera.build().0.x,
-                desc.camera.build().0.y,
-                desc.camera.build().0.z,
-                0.0
-            ]
+            matrix: desc.camera.build().0.into()
         };
 
         let voxel_list = vec![CompiledNode {
@@ -521,12 +516,7 @@ impl Render {
                 bytemuck::cast_slice(&[self.camera_pos_uniform])
             );
 
-            self.camera_rot_uniform.matrix = [
-                self.camera.build().0.x,
-                self.camera.build().0.y,
-                self.camera.build().0.z,
-                0.0
-            ];
+            self.camera_rot_uniform.matrix = self.camera.build().0.into();
 
             app.queue.write_buffer(
                 &self.camera_rot_buffer,
@@ -573,12 +563,25 @@ impl Camera {
         }
     }
 
-    pub fn build(&self) -> (Vector3<f32>, Point3<f32>) {
+    pub fn build(&self) -> (Matrix4<f32>, Point3<f32>) {
         (
-            // Matrix4::from_angle_x(Rad(self.rot.x)) *
-            // Matrix4::from_angle_y(Rad(self.rot.x)) *
-            // Matrix4::from_angle_z(Rad(self.rot.x)),
-            self.rot,
+            {
+                Matrix4::identity() *
+                // Matrix4::new(
+                //     1.0, 0.0, 0.0, 0.0,
+                //     0.0, 1.0, 0.0, 0.0,
+                //     0.0, 0.0, 1.0, 0.0,
+                //     0.0, 0.0, 0.0, 1.0
+                // )
+                Matrix4::from_angle_x(Rad(self.rot.x)) *
+                Matrix4::from_angle_y(Rad(self.rot.y)) *
+                Matrix4::from_angle_z(Rad(self.rot.z))
+                // Matrix4::look_at_lh(Point3 {
+                //     x: self.rot.x,
+                //     y: self.rot.y,
+                //     z: self.rot.z
+                // }, self.pos, Vector3::unit_y())
+            },
             self.pos
         )
     }
@@ -593,7 +596,9 @@ pub struct CameraController {
     is_right_pressed: bool,
 
     is_left_rot_pressed: bool,
-    is_right_rot_pressed: bool
+    is_right_rot_pressed: bool,
+    is_up_rot_pressed: bool,
+    is_down_rot_pressed: bool
 }
 
 pub struct CameraControllerCreateDescriptor {
@@ -612,7 +617,9 @@ impl CameraController {
             is_right_pressed: false,
 
             is_left_rot_pressed: false,
-            is_right_rot_pressed: false
+            is_right_rot_pressed: false,
+            is_down_rot_pressed: false,
+            is_up_rot_pressed: false
         }
     }
 
@@ -629,7 +636,7 @@ impl CameraController {
             } => {
                 let is_pressed = *state == ElementState::Pressed;
                 match keycode {
-                    winit::keyboard::KeyCode::KeyW | winit::keyboard::KeyCode::ArrowUp => {
+                    winit::keyboard::KeyCode::KeyW => {
                         self.is_forward_pressed = is_pressed;
                         true
                     }
@@ -637,7 +644,7 @@ impl CameraController {
                         self.is_left_pressed = is_pressed;
                         true
                     }
-                    winit::keyboard::KeyCode::KeyS | winit::keyboard::KeyCode::ArrowDown => {
+                    winit::keyboard::KeyCode::KeyS => {
                         self.is_backward_pressed = is_pressed;
                         true
                     }
@@ -654,6 +661,14 @@ impl CameraController {
                         self.is_right_rot_pressed = is_pressed;
                         true
                     }
+                    winit::keyboard::KeyCode::ArrowUp => {
+                        self.is_up_rot_pressed = is_pressed;
+                        true
+                    }
+                    winit::keyboard::KeyCode::ArrowDown => {
+                        self.is_down_rot_pressed = is_pressed;
+                        true
+                    }
 
                     _ => false,
                 }
@@ -664,34 +679,37 @@ impl CameraController {
 
     #[allow(unused_variables)]
     pub fn handle_camera(&self, camera: &mut Camera, app: &App) {
-        let sin_ax = camera.rot.x.sin();
-        let cos_ax = camera.rot.x.cos();
-
         let sin_az = camera.rot.z.sin();
         let cos_az = camera.rot.z.cos();
 
         if self.is_left_rot_pressed {
-            camera.rot.x += self.speed * app.delta_time as f32;
+            camera.rot.z += self.speed / 2.0 * app.delta_time as f32;
         }
         if self.is_right_rot_pressed {
-            camera.rot.x -= self.speed * app.delta_time as f32;
+            camera.rot.z -= self.speed / 2.0 * app.delta_time as f32;
+        }
+        if self.is_up_rot_pressed {
+            camera.rot.y += self.speed / 2.0 * app.delta_time as f32;
+        }
+        if self.is_down_rot_pressed {
+            camera.rot.y -= self.speed / 2.0 * app.delta_time as f32;
         }
 
         if self.is_forward_pressed {
-            camera.pos.x += cos_ax * app.delta_time as f32 * self.speed;
-            camera.pos.y += sin_ax * app.delta_time as f32 * self.speed;
+            camera.pos.x += self.speed * cos_az * app.delta_time as f32;
+            camera.pos.y += self.speed * sin_az * app.delta_time as f32;
         }
         if self.is_backward_pressed {
-            camera.pos.x -= cos_ax * app.delta_time as f32 * self.speed;
-            camera.pos.y -= sin_ax * app.delta_time as f32 * self.speed;
+            camera.pos.x += -self.speed * cos_az * app.delta_time as f32;
+            camera.pos.y += -self.speed * sin_az * app.delta_time as f32;
         }
         if self.is_left_pressed {
-            camera.pos.x += sin_ax * app.delta_time as f32 * self.speed;
-            camera.pos.y -= cos_ax * app.delta_time as f32 * self.speed;
+            camera.pos.x += self.speed * sin_az * app.delta_time as f32;
+            camera.pos.y += -self.speed * cos_az * app.delta_time as f32;
         }
         if self.is_right_pressed {
-            camera.pos.x -= sin_ax * app.delta_time as f32 * self.speed;
-            camera.pos.y += cos_ax * app.delta_time as f32 * self.speed;
+            camera.pos.x += -self.speed * sin_az * app.delta_time as f32;
+            camera.pos.y += self.speed * cos_az * app.delta_time as f32;
         }
     }
 }

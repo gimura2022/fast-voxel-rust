@@ -19,7 +19,7 @@ struct TimeUniform {
 }
 
 struct CameraMatrixUniform {
-    matrix: vec4<f32>
+    matrix: mat4x4<f32>
 }
 
 struct CameraPositionUniform {

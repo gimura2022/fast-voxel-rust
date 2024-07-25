@@ -28,7 +28,7 @@ pub async fn run() {
         }),
         camera: app.create_camera(&CameraCreateDescriptor {
             pos: (-3.0, 0.0, -3.0).into(),
-            rot: (0.0, 0.0, 10.0).into()
+            rot: (0.0, 0.0, 0.0).into()
         })
     });
 

@@ -54,11 +54,55 @@ fn sph_int(ro: vec3<f32>, rd: vec3<f32>, cube: Cube) -> IntersectInfo {
     return out;
 }
 
+//! ifndef _eng_header_wgsl
+//! define _eng_header_wgsl ""
+
+struct VertexInput {
+    @location(0) position: vec3<f32>,
+};
+
+struct VertexOutput {
+    @builtin(position) clip_position: vec4<f32>,
+    @location(0) uv: vec2<f32>
+};
+
+struct MetaDataUniform {
+    res: vec2<f32>,
+}
+
+struct TimeUniform {
+    time: u32
+}
+
+struct CameraMatrixUniform {
+    matrix: mat4x4<f32>
+}
+
+struct CameraPositionUniform {
+    pos: vec4<f32>
+}
+
+@group(0) @binding(0) var<uniform> u_meta_data: MetaDataUniform;
+@group(1) @binding(0) var<uniform> u_time: TimeUniform;
+@group(2) @binding(0) var<uniform> u_cam_pos: CameraPositionUniform;
+@group(3) @binding(0) var<uniform> u_cam_rot: CameraMatrixUniform;
+
+//! endif
+//! include "eng_header"
+
 fn box_int(_ro: vec3<f32>, _rd: vec3<f32>, cube: Cube) -> IntersectInfo {
     var out: IntersectInfo;
 
-    let rd = cube.rotation * _rd;
-    let ro = cube.rotation * (_ro - cube.position);
+    // let out_rot = cube.rotation * mat3x3<f32>(
+    //     u_cam_rot.matrix.x.xyz,
+    //     u_cam_rot.matrix.y.xyz,
+    //     u_cam_rot.matrix.z.xyz
+    // );
+
+    let out_rot = cube.rotation;
+
+    let rd = out_rot * _rd;
+    let ro = out_rot * (_ro - cube.position);
 
     let m = vec3<f32>(1.0) / rd;
 
@@ -78,7 +122,7 @@ fn box_int(_ro: vec3<f32>, _rd: vec3<f32>, cube: Cube) -> IntersectInfo {
         return out;
     }
 
-    let txi = transpose(cube.rotation);
+    let txi = transpose(out_rot);
 
     if t1.x > t1.y && t1.x > t1.z { out.normal = txi[0] * s.x; }
     else if t1.y > t1.z           { out.normal = txi[1] * s.y; }
@@ -180,7 +224,7 @@ fn cast_ray(ro: vec3<f32>, rd: vec3<f32>) -> IntersectInfo {
             Material(
                 vec3<f32>(0.0),
                 vec3<f32>(1.0),
-                0.0,
+                0.5,
                 0.0
             ),
             vec3<f32>(0.0, 0.0, -11.0),
@@ -195,7 +239,7 @@ fn cast_ray(ro: vec3<f32>, rd: vec3<f32>) -> IntersectInfo {
             Material(
                 vec3<f32>(0.0),
                 vec3<f32>(1.0),
-                0.0,
+                1.0,
                 0.0
             ),
             vec3<f32>(10.0, 0.0, 0.0),
@@ -226,7 +270,7 @@ fn cast_ray(ro: vec3<f32>, rd: vec3<f32>) -> IntersectInfo {
             Material(
                 vec3<f32>(0.0),
                 vec3<f32>(1.0, 0.0, 0.0),
-                0.0,
+                1.0,
                 0.0
             ),
             vec3<f32>(0.0, 10.0, 0.0),
@@ -241,7 +285,7 @@ fn cast_ray(ro: vec3<f32>, rd: vec3<f32>) -> IntersectInfo {
             Material(
                 vec3<f32>(0.0),
                 vec3<f32>(0.0, 1.0, 0.0),
-                0.0,
+                1.0,
                 0.0
             ),
             vec3<f32>(0.0, -10.0, 0.0),
@@ -320,6 +364,41 @@ const MAX_DEPTH = 4;
 
 //! ifndef _eng_rand_wgsl
 //! define _eng_rand_wgsl ""
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//! include "eng_header"
 
 var<private> seed: f32 = 0.0;
 
@@ -424,40 +503,39 @@ fn normal_point(rand: vec2<f32>, n: vec3<f32>) -> vec3<f32> {
 
 //! endif
 //! include "ray_trasing"
-//! ifndef _eng_header_wgsl
-//! define _eng_header_wgsl ""
 
-struct VertexInput {
-    @location(0) position: vec3<f32>,
-};
 
-struct VertexOutput {
-    @builtin(position) clip_position: vec4<f32>,
-    @location(0) uv: vec2<f32>
-};
 
-struct MetaDataUniform {
-    res: vec2<f32>,
-}
 
-struct TimeUniform {
-    time: u32
-}
 
-struct CameraMatrixUniform {
-    matrix: vec4<f32>
-}
 
-struct CameraPositionUniform {
-    pos: vec4<f32>
-}
 
-@group(0) @binding(0) var<uniform> u_meta_data: MetaDataUniform;
-@group(1) @binding(0) var<uniform> u_time: TimeUniform;
-@group(2) @binding(0) var<uniform> u_cam_pos: CameraPositionUniform;
-@group(3) @binding(0) var<uniform> u_cam_rot: CameraMatrixUniform;
 
-//! endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //! include "eng_header"
 //! ifndef _eng_vertex_wgsl
 //! define _eng_vertex_wgsl ""
@@ -477,26 +555,6 @@ fn vs_main(model: VertexInput) -> VertexOutput {
 
 //! define SAMPLE_COUNT "10"
 
-fn get_ray_direction(tex_coord: vec2<f32>, view_size: vec2<f32>, fov: f32, dir: vec3<f32>, up: vec3<f32>) -> vec3<f32> {
-    let tex_diff = 0.5 * vec2<f32>(1.0 - 2.0 * tex_coord.x, 2.0 * tex_coord.y - 1.0);
-    let angle_diff = tex_diff * vec2<f32>(view_size.x / view_size.y, 1.0) * tan(fov * 0.5);
-
-    let ray_dir = normalize(vec3<f32>(angle_diff, 1.0)) * mat3x3<f32>(
-        cos(45.0), sin(45.0), 0.0,
-        -sin(45.0), cos(45.0), 0.0,
-        0.0, 0.0, 1.0
-    );
-
-    let right = normalize(cross(up, dir));
-    let view_to_world = mat3x3(
-        right,
-        up,
-        dir
-    );
-
-    return view_to_world * ray_dir;
-}
-
 @fragment
 fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
     let uv = in.uv * u_meta_data.res / u_meta_data.res.y;
@@ -504,20 +562,20 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
     var ray_orig = u_cam_pos.pos.xyz;
 
     // let angle = f32(u_time.time) / 100.0;
-    let ray_dir = normalize(vec3<f32>(1.0, uv)) * mat3x3<f32>(
-        cos(u_cam_rot.matrix.x), sin(u_cam_rot.matrix.x), 0.0,
-        -sin(u_cam_rot.matrix.x), cos(u_cam_rot.matrix.x), 0.0,
-        0.0, 0.0, 1.0
-    );
+    // let ray_dir = normalize(vec3<f32>(1.0, uv)) * mat3x3<f32>(
+    //     cos(u_cam_rot.matrix.x), sin(u_cam_rot.matrix.x), 0.0,
+    //     -sin(u_cam_rot.matrix.x), cos(u_cam_rot.matrix.x), 0.0,
+    //     0.0, 0.0, 1.0
+    // );
 
-    // let ray_dir = (vec4<f32>(normalize(vec3<f32>(1.0, uv)), 1.0) * u_cam_rot.matrix).xyz;
+    let ray_dir = (vec4<f32>(normalize(vec3<f32>(1.0, uv)), 1.0) * u_cam_rot.matrix).xyz;
 
     // let ray_dir = normalize(vec3<f32>(1.0, uv));
 
     var color = vec3<f32>(0.0);
 
 for (var sample = 0; sample < 10; sample++) {
-//        seed = u32(sample) * u32(u_time.time);
+        seed = f32(sample) * f32(u_time.time);
         let tmp_color = trace_ray(ray_orig, ray_dir, uv);
         color += tmp_color;
     }
