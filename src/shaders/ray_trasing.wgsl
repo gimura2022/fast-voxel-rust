@@ -22,38 +22,6 @@ struct IntersectInfo {
     material: Material
 }
 
-fn sph_int(ro: vec3<f32>, rd: vec3<f32>, cube: Cube) -> IntersectInfo {
-    var out: IntersectInfo;
-
-    let L = ro - cube.position;
-    let a = dot(rd, rd);
-    let b = 2.0 * dot(L, rd);
-    let c = dot(L, L) - cube.size * cube.size;
-    let D = b * b - 4 * a * c;
-
-    if D < 0.0 {
-        out.is_intersected = false;
-        return out;
-    }
-
-    let r1 = (-b - sqrt(D)) / (2.0 * a);
-    let r2 = (-b + sqrt(D)) / (2.0 * a);
-
-    if r1 > 0.0 {
-        out.fraction = r1;
-    } else if r2 > 0.0 {
-        out.fraction = r2;
-    } else {
-        out.is_intersected = false;
-        return out;
-    }
-
-    out.normal = normalize(rd * out.fraction + L);
-    out.is_intersected = true;
-
-    return out;
-}
-
 //! include "eng_header"
 
 fn box_int(_ro: vec3<f32>, _rd: vec3<f32>, cube: Cube) -> IntersectInfo {
@@ -375,7 +343,7 @@ fn trace_ray(_ro: vec3<f32>, _rd: vec3<f32>, uv: vec2<f32>) -> vec3<f32> {
     //! endif
 }
 
-const PI = 3.1415926535;
+const PI = 3.14;
 
 fn rand_point(rand: vec2<f32>) -> vec3<f32> {
     let cos_theta = sqrt(1.0 - rand.x);
