@@ -400,7 +400,7 @@ impl Render {
         });
 
         let camera_controller = CameraController::new(CameraControllerCreateDescriptor {
-            speed: 50.0
+            speed: 15.0
         }, &app);
 
         Self {

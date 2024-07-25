@@ -2,7 +2,7 @@
 //! include "eng_header"
 //! include "eng_vertex"
 
-//! define SAMPLE_COUNT "5"
+//! define SAMPLE_COUNT "10"
 
 fn get_ray_direction(tex_coord: vec2<f32>, view_size: vec2<f32>, fov: f32, dir: vec3<f32>, up: vec3<f32>) -> vec3<f32> {
     let tex_diff = 0.5 * vec2<f32>(1.0 - 2.0 * tex_coord.x, 2.0 * tex_coord.y - 1.0);

@@ -1,7 +1,7 @@
 pub mod render;
 pub mod voxel;
 
-use std::time::{self, Instant};
+use std::time::Instant;
 
 use log::*;
 use wgpu::*;
@@ -30,7 +30,7 @@ pub struct App<'a> {
     size: PhysicalSize<u32>,
 
     window: &'a Window,
-    delta_time: u128
+    delta_time: f64
 }
 
 impl<'a> App<'a> {
@@ -115,7 +115,7 @@ impl<'a> App<'a> {
             surface,
             surface_config,
             size,
-            delta_time: 0
+            delta_time: 0.0
         }
     }
 
@@ -137,10 +137,12 @@ impl<'a> App<'a> {
 
         event_loop.run(move |event, control_flow| {
             let new_time = Instant::now();
-            self.delta_time = current_time.elapsed().as_nanos() / 1000000000;
-            current_time = new_time;
 
-            trace!("delta: {}", self.delta_time);
+            // trace!("delta: {}, new_time: {:?}, current_time: {:?}",
+            //     self.delta_time,
+            //     new_time,
+            //     current_time
+            // );
 
             match event {
                 Event::WindowEvent {
@@ -169,6 +171,9 @@ impl<'a> App<'a> {
 
                 _ => {}
             }
+
+            self.delta_time = current_time.elapsed().as_secs_f64() - new_time.elapsed().as_secs_f64();
+            current_time = new_time;
         }).unwrap();
     }
 }

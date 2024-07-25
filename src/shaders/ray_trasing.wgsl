@@ -316,7 +316,7 @@ fn cast_ray(ro: vec3<f32>, rd: vec3<f32>) -> IntersectInfo {
     return out;
 }
 
-const MAX_DEPTH = 7;
+const MAX_DEPTH = 4;
 
 //! include "eng_rand"
 
@@ -328,6 +328,9 @@ fn trace_ray(_ro: vec3<f32>, _rd: vec3<f32>, uv: vec2<f32>) -> vec3<f32> {
     var ro = _ro;
     var rd = _rd;
 
+    //! define ray_trasing ""
+
+    //! ifdef ray_trasing
     for (var i = 0; i < MAX_DEPTH; i++) {
         let hit = cast_ray(ro, rd);
 
@@ -359,6 +362,7 @@ fn trace_ray(_ro: vec3<f32>, _rd: vec3<f32>, uv: vec2<f32>) -> vec3<f32> {
     }
 
     return L;
+    //! endif
 }
 
 const PI = 3.1415926535;
