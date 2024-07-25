@@ -13,6 +13,9 @@ edition = "2021"
 [lib]
 crate-type = ["cdylib", "rlib"]
 
+[build-dependencies]
+fast-voxel-perprocessor = { path = "fast-voxel-perprocessor" }
+
 [dependencies]
 fast-voxel-lib = { path = "fast-voxel-lib" }
 fast-voxel-perprocessor = { path = "fast-voxel-perprocessor" }
