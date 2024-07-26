@@ -1,6 +1,7 @@
 //! include "ray_trasing"
 //! include "eng_header"
 //! include "eng_vertex"
+//! include "eng_rand"
 
 //! define SAMPLE_COUNT "10"
 
@@ -21,11 +22,13 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
 
     // let ray_dir = normalize(vec3<f32>(1.0, uv));
 
+    // seed = f32(u_time.time);
+    // var color = trace_ray(ray_orig, ray_dir, uv + 1);
     var color = vec3<f32>(0.0);
 
     //! insert "for (var sample = 0; sample < SAMPLE_COUNT; sample++) {"
-        seed = f32(sample) * f32(u_time.time);
-        let tmp_color = trace_ray(ray_orig, ray_dir, uv);
+        seed = f32(u_time.time);
+        let tmp_color = trace_ray(ray_orig, ray_dir, uv + f32(sample) * 10.0);
         color += tmp_color;
     }
 

@@ -5,9 +5,7 @@
 
 var<private> seed: f32 = 0.0;
 
-fn _rand(_co: vec2<f32>) -> f32 {
-    let co = _co * f32(u_time.time) * 12.343;
-    //let co = _co;
+fn _rand(co: vec2<f32>) -> f32 {
     return fract(sin(dot(co.xy, vec2<f32>(12.9898, 78.233))) * 43758.5453);
 }
 

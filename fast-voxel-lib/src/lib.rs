@@ -144,6 +144,8 @@ impl<'a> App<'a> {
             //     current_time
             // );
 
+            // trace!("fps: {}, delta: {}", 1.0 / self.delta_time, self.delta_time);
+
             match event {
                 Event::WindowEvent {
                     ref event,

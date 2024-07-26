@@ -81,7 +81,7 @@ fn cast_ray(ro: vec3<f32>, rd: vec3<f32>) -> IntersectInfo {
             Material(
                 vec3<f32>(1.00000, 0.85882, 0.38824),
                 vec3<f32>(1.0),
-                0.8,
+                0.0,
                 0.3
             ),
             vec3<f32>(0.0, 0.0, 3.0),
@@ -173,7 +173,7 @@ fn cast_ray(ro: vec3<f32>, rd: vec3<f32>) -> IntersectInfo {
             Material(
                 vec3<f32>(0.0),
                 vec3<f32>(1.0),
-                1.0,
+                0.0,
                 0.0
             ),
             vec3<f32>(10.0, 0.0, 0.0),
@@ -204,7 +204,7 @@ fn cast_ray(ro: vec3<f32>, rd: vec3<f32>) -> IntersectInfo {
             Material(
                 vec3<f32>(0.0),
                 vec3<f32>(1.0, 0.0, 0.0),
-                1.0,
+                0.1,
                 0.0
             ),
             vec3<f32>(0.0, 10.0, 0.0),
@@ -219,7 +219,7 @@ fn cast_ray(ro: vec3<f32>, rd: vec3<f32>) -> IntersectInfo {
             Material(
                 vec3<f32>(0.0),
                 vec3<f32>(0.0, 1.0, 0.0),
-                1.0,
+                0.0,
                 0.0
             ),
             vec3<f32>(0.0, -10.0, 0.0),

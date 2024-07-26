@@ -115,7 +115,7 @@ fn cast_ray(ro: vec3<f32>, rd: vec3<f32>) -> IntersectInfo {
             Material(
                 vec3<f32>(1.00000, 0.85882, 0.38824),
                 vec3<f32>(1.0),
-                0.8,
+                0.0,
                 0.3
             ),
             vec3<f32>(0.0, 0.0, 3.0),
@@ -207,7 +207,7 @@ fn cast_ray(ro: vec3<f32>, rd: vec3<f32>) -> IntersectInfo {
             Material(
                 vec3<f32>(0.0),
                 vec3<f32>(1.0),
-                1.0,
+                0.0,
                 0.0
             ),
             vec3<f32>(10.0, 0.0, 0.0),
@@ -238,7 +238,7 @@ fn cast_ray(ro: vec3<f32>, rd: vec3<f32>) -> IntersectInfo {
             Material(
                 vec3<f32>(0.0),
                 vec3<f32>(1.0, 0.0, 0.0),
-                1.0,
+                0.1,
                 0.0
             ),
             vec3<f32>(0.0, 10.0, 0.0),
@@ -253,7 +253,7 @@ fn cast_ray(ro: vec3<f32>, rd: vec3<f32>) -> IntersectInfo {
             Material(
                 vec3<f32>(0.0),
                 vec3<f32>(0.0, 1.0, 0.0),
-                1.0,
+                0.0,
                 0.0
             ),
             vec3<f32>(0.0, -10.0, 0.0),
@@ -370,9 +370,7 @@ const MAX_DEPTH = 4;
 
 var<private> seed: f32 = 0.0;
 
-fn _rand(_co: vec2<f32>) -> f32 {
-    let co = _co * f32(u_time.time) * 12.343;
-    //let co = _co;
+fn _rand(co: vec2<f32>) -> f32 {
     return fract(sin(dot(co.xy, vec2<f32>(12.9898, 78.233))) * 43758.5453);
 }
 
@@ -521,6 +519,72 @@ fn vs_main(model: VertexInput) -> VertexOutput {
 //! endif
 //! include "eng_vertex"
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//! include "eng_rand"
+
 //! define SAMPLE_COUNT "10"
 
 @fragment
@@ -540,11 +604,13 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
 
     // let ray_dir = normalize(vec3<f32>(1.0, uv));
 
+    // seed = f32(u_time.time);
+    // var color = trace_ray(ray_orig, ray_dir, uv + 1);
     var color = vec3<f32>(0.0);
 
 for (var sample = 0; sample < 10; sample++) {
-        seed = f32(sample) * f32(u_time.time);
-        let tmp_color = trace_ray(ray_orig, ray_dir, uv);
+        seed = f32(u_time.time);
+        let tmp_color = trace_ray(ray_orig, ray_dir, uv + f32(sample) * 10.0);
         color += tmp_color;
     }
 
