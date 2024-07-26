@@ -368,7 +368,7 @@ const MAX_DEPTH = 4;
 
 //! include "eng_header"
 
-var<private> seed: f32 = 0.0;
+var<private> seed: f32 = 8498201.443902;
 
 fn _rand(co: vec2<f32>) -> f32 {
     return fract(sin(dot(co.xy, vec2<f32>(12.9898, 78.233))) * 43758.5453);
@@ -609,8 +609,8 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
     var color = vec3<f32>(0.0);
 
 for (var sample = 0; sample < 10; sample++) {
-        seed = f32(u_time.time);
-        let tmp_color = trace_ray(ray_orig, ray_dir, uv + f32(sample) * 10.0);
+        seed = (f32(sample) + uv * 18.23189).x;
+        let tmp_color = trace_ray(ray_orig, ray_dir, uv + f32(sample) * 23.00231);
         color += tmp_color;
     }
 

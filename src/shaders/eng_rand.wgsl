@@ -3,7 +3,7 @@
 
 //! include "eng_header"
 
-var<private> seed: f32 = 0.0;
+var<private> seed: f32 = 8498201.443902;
 
 fn _rand(co: vec2<f32>) -> f32 {
     return fract(sin(dot(co.xy, vec2<f32>(12.9898, 78.233))) * 43758.5453);
