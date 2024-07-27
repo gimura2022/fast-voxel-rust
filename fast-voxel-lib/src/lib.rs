@@ -79,10 +79,7 @@ impl<'a> App<'a> {
                 required_limits: if cfg!(target_arch = "wasm32") {
                     wgpu::Limits::downlevel_webgl2_defaults()
                 } else {
-                    let mut limits = wgpu::Limits::default();
-                    limits.max_bind_groups = 8;
-
-                    limits
+                    wgpu::Limits::default()
                 },
                 label: None,
             },
@@ -125,10 +122,6 @@ impl<'a> App<'a> {
 
     pub fn create_shader(&self, desc: &render::ShaderCreateDescriptor) -> render::Shader {
         render::Shader::new(desc, &self)
-    }
-
-    pub fn create_camera(&self, desc: &render::CameraCreateDescriptor) -> render::Camera {
-        render::Camera::new(desc, &self)
     }
 
     #[allow(unused_assignments)]

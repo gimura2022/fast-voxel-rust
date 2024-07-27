@@ -9,7 +9,7 @@
 fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
     let uv = in.uv * u_meta_data.res / u_meta_data.res.y;
     
-    var ray_orig = u_cam_pos.pos.xyz;
+    var ray_orig = u_camera.pos.xyz;
 
     // let angle = f32(u_time.time) / 100.0;
     // let ray_dir = normalize(vec3<f32>(1.0, uv)) * mat3x3<f32>(
@@ -18,7 +18,7 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
     //     0.0, 0.0, 1.0
     // );
 
-    let ray_dir = (vec4<f32>(normalize(vec3<f32>(1.0, uv)), 1.0) * u_cam_rot.matrix).xyz;
+    let ray_dir = (normalize(vec3<f32>(1.0, uv)) * u_camera.matrix).xyz;
 
     // let ray_dir = normalize(vec3<f32>(1.0, uv));
 

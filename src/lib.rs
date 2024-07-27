@@ -26,10 +26,10 @@ pub async fn run() {
         shader: app.create_shader(&ShaderCreateDescriptor {
             shdaer_source: include_str!("compiled.wgsl").to_string()
         }),
-        camera: app.create_camera(&CameraCreateDescriptor {
-            pos: (-3.0, 0.0, -3.0).into(),
-            rot: (0.0, 0.0, 0.0).into()
-        })
+        camera: (
+            (0.0, 0.0, -5.0).into(),
+            (0.0, 0.0, 0.0).into()
+        )
     });
 
     app.run(render, event_loop);

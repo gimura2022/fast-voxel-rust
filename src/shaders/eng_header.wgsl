@@ -12,23 +12,34 @@ struct VertexOutput {
 
 struct MetaDataUniform {
     res: vec2<f32>,
-}
-
-struct TimeUniform {
     time: u32
 }
 
-struct CameraMatrixUniform {
-    matrix: mat4x4<f32>
+struct CameraUniform {
+    matrix: mat3x3<f32>,
+    pos: vec3<f32>,
 }
 
-struct CameraPositionUniform {
-    pos: vec4<f32>
+struct Cube {
+    position: vec3<f32>,
+    rotation: mat3x3<f32>,
+    size: f32,
+
+    material: Material,
+    childs: array<f32, 8>,
+    is_leaf: f32,
 }
 
-@group(0) @binding(0) var<uniform> u_meta_data: MetaDataUniform;
-@group(1) @binding(0) var<uniform> u_time: TimeUniform;
-@group(2) @binding(0) var<uniform> u_cam_pos: CameraPositionUniform;
-@group(3) @binding(0) var<uniform> u_cam_rot: CameraMatrixUniform;
+struct Material {
+    emmitance: vec3<f32>,
+    reflectance: vec3<f32>,
+    roughness: f32,
+    opacity: f32
+}
+
+@group(0) @binding(0) var<uniform> u_camera: CameraUniform;
+@group(1) @binding(0) var<uniform> u_meta_data: MetaDataUniform;
+
+@group(2) @binding(0) var<storage, read> b_voxels: array<Cube>;
 
 //! endif
