@@ -9,7 +9,7 @@ fn main() -> Result<(), ()> {
 
     match preprocessed {
         Ok(source) => {
-            let mut file = File::create("src/compiled.wgsl")
+            let mut file = File::create("target/compiled.wgsl")
                 .expect("Error to open file!");
 
             file.write_all(source.as_bytes())

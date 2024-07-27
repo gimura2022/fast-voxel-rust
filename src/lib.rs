@@ -24,7 +24,7 @@ pub async fn run() {
     let app = App::new(AppDescriptor {  }, &window).await;
     let render = app.create_render(RenderCreateDescriptor {
         shader: app.create_shader(&ShaderCreateDescriptor {
-            shdaer_source: include_str!("compiled.wgsl").to_string()
+            shdaer_source: include_str!("../target/compiled.wgsl").to_string()
         }),
         camera: (
             (0.0, 0.0, -5.0).into(),
