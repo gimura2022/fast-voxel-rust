@@ -1,15 +1,11 @@
-//! ifndef _ray_trasing_wgsl
-//! define _ray_trasing_wgsl ""
-
-struct IntersectInfo {
-    is_intersected: bool,
-    fraction: f32,
-    normal: vec3<f32>,
-    material: Material
-}
+//! ifndef _std_wgsl
+//! define _std_wgsl ""
 
 //! ifndef _eng_header_wgsl
 //! define _eng_header_wgsl ""
+
+//! ifndef _uniforms_wgsl
+//! define _uniforms_wgsl ""
 
 struct VertexInput {
     @location(0) position: vec3<f32>,
@@ -30,6 +26,9 @@ struct CameraUniform {
     pos: vec3<f32>,
 }
 
+//! ifndef _render_def_wgsl
+//! define _render_def_wgsl ""
+
 struct Cube {
     position: vec3<f32>,
     rotation: mat3x3<f32>,
@@ -47,22 +46,15 @@ struct Material {
     opacity: f32
 }
 
-@group(0) @binding(0) var<uniform> u_camera: CameraUniform;
-@group(1) @binding(0) var<uniform> u_meta_data: MetaDataUniform;
-
-@group(2) @binding(0) var<storage, read> b_voxels: array<Cube>;
-
-//! endif
-//! include "eng_header"
+struct IntersectInfo {
+    is_intersected: bool,
+    fraction: f32,
+    normal: vec3<f32>,
+    material: Material
+}
 
 fn box_int(_ro: vec3<f32>, _rd: vec3<f32>, cube: Cube) -> IntersectInfo {
     var out: IntersectInfo;
-
-    // let out_rot = cube.rotation * mat4x4<f32>(
-    //     u_cam_rot.matrix.x.xyz,
-    //     u_cam_rot.matrix.y.xyz,
-    //     u_cam_rot.matrix.z.xyz
-    // );
 
     let out_rot = mat3x3<f32>(
         cube.rotation.x.xyz,
@@ -105,265 +97,136 @@ fn box_int(_ro: vec3<f32>, _rd: vec3<f32>, cube: Cube) -> IntersectInfo {
     return out;
 }
 
-// fn voxel_dist(p: vec3<f32>, cube: Cube) -> f32 {
-//     return length(p - cube.position) - cube.size;
-// }
+//! endif
+//! include "render_def"
 
-const FAR_DISTANCE = 1000000.0;
-const COUNT = 12;
+@group(0) @binding(0) var<uniform> u_camera: CameraUniform;
+@group(1) @binding(0) var<uniform> u_meta_data: MetaDataUniform;
+@group(2) @binding(0) var<storage, read> b_voxels: array<Cube>;
 
-fn cast_ray(ro: vec3<f32>, rd: vec3<f32>, uv: vec2<f32>) -> IntersectInfo {
-    var out: IntersectInfo;
-    var min_dist = FAR_DISTANCE;
+//! endif
+//! include "uniforms"
+//! ifndef _vertex_wgsl
+//! define _vertex_wgsl ""
 
-    // var sphs = array<Cube, COUNT>(
-    //     Cube(
-    //         1.0,
-    //         Material(
-    //             vec3<f32>(1.00000, 0.85882, 0.38824),
-    //             vec3<f32>(1.0),
-    //             0.0,
-    //             0.3
-    //         ),
-    //         vec3<f32>(0.0, 0.0, 3.0),
-    //         mat3x3<f32>(
-    //             1.0, 0.0, 0.0,
-    //             0.0, 1.0, 0.0,
-    //             0.0, 0.0, 1.0
-    //         )
-    //     ),
-    //     Cube(
-    //         4,
-    //         Material(
-    //             vec3<f32>(0.0),
-    //             vec3<f32>(1.0),
-    //             0.0,
-    //             0.0
-    //         ),
-    //         vec3<f32>(0.0, -5, 6),
-    //         mat3x3<f32>(
-    //             1.0, 0.0, 0.0,
-    //             0.0, 1.0, 0.0,
-    //             0.0, 0.0, 1.0
-    //         )
-    //     ),
-    //     Cube(
-    //         4,
-    //         Material(
-    //             vec3<f32>(0.0),
-    //             vec3<f32>(1.0),
-    //             0.0,
-    //             0.0
-    //         ),
-    //         vec3<f32>(0.0, 5, 6),
-    //         mat3x3<f32>(
-    //             1.0, 0.0, 0.0,
-    //             0.0, 1.0, 0.0,
-    //             0.0, 0.0, 1.0
-    //         )
-    //     ),
 
-    //     Cube(
-    //         2,
-    //         Material(
-    //             vec3<f32>(0.0),
-    //             vec3<f32>(1.0),
-    //             0.0,
-    //             0.0
-    //         ),
-    //         vec3<f32>(2.0, 0.0, 4),
-    //         mat3x3<f32>(
-    //             1.0, 0.0, 0.0,
-    //             0.0, 1.0, 0.0,
-    //             0.0, 0.0, 1.0
-    //         )
-    //     ),
-    //     Cube(
-    //         2,
-    //         Material(
-    //             vec3<f32>(0.0),
-    //             vec3<f32>(1.0),
-    //             0.0,
-    //             0.0
-    //         ),
-    //         vec3<f32>(-2.0, 0.0, 4),
-    //         mat3x3<f32>(
-    //             1.0, 0.0, 0.0,
-    //             0.0, 1.0, 0.0,
-    //             0.0, 0.0, 1.0
-    //         )
-    //     ),
 
-    //     Cube(
-    //         6,
-    //         Material(
-    //             vec3<f32>(0.0),
-    //             vec3<f32>(1.0),
-    //             0.5,
-    //             0.0
-    //         ),
-    //         vec3<f32>(0.0, 0.0, -11.0),
-    //         mat3x3<f32>(
-    //             1.0, 0.0, 0.0,
-    //             0.0, 1.0, 0.0,
-    //             0.0, 0.0, 1.0
-    //         )
-    //     ),
-    //     Cube(
-    //         6,
-    //         Material(
-    //             vec3<f32>(0.0),
-    //             vec3<f32>(1.0),
-    //             0.0,
-    //             0.0
-    //         ),
-    //         vec3<f32>(10.0, 0.0, 0.0),
-    //         mat3x3<f32>(
-    //             1.0, 0.0, 0.0,
-    //             0.0, 1.0, 0.0,
-    //             0.0, 0.0, 1.0
-    //         )
-    //     ),
-    //     // Cube(
-    //     //     6,
-    //     //     Material(
-    //     //         vec3<f32>(0.0),
-    //     //         vec3<f32>(1.0),
-    //     //         0.1,
-    //     //         0.0
-    //     //     ),
-    //     //     vec3<f32>(-10.0, 0.0, 0.0),
-    //     //     mat3x3<f32>(
-    //     //         1.0, 0.0, 0.0,
-    //     //         0.0, 1.0, 0.0,
-    //     //         0.0, 0.0, 1.0
-    //     //     )
-    //     // ),
 
-    //     Cube(
-    //         6,
-    //         Material(
-    //             vec3<f32>(0.0),
-    //             vec3<f32>(1.0, 0.0, 0.0),
-    //             0.1,
-    //             0.0
-    //         ),
-    //         vec3<f32>(0.0, 10.0, 0.0),
-    //         mat3x3<f32>(
-    //             1.0, 0.0, 0.0,
-    //             0.0, 1.0, 0.0,
-    //             0.0, 0.0, 1.0
-    //         )
-    //     ),
-    //     Cube(
-    //         6,
-    //         Material(
-    //             vec3<f32>(0.0),
-    //             vec3<f32>(0.0, 1.0, 0.0),
-    //             0.0,
-    //             0.0
-    //         ),
-    //         vec3<f32>(0.0, -10.0, 0.0),
-    //         mat3x3<f32>(
-    //             1.0, 0.0, 0.0,
-    //             0.0, 1.0, 0.0,
-    //             0.0, 0.0, 1.0
-    //         )
-    //     ),
 
-    //     Cube(
-    //         1,
-    //         Material(
-    //             vec3<f32>(0.0),
-    //             vec3<f32>(1.0),
-    //             0.0,
-    //             0.0
-    //         ),
-    //         vec3<f32>(2.0, -1, -4.0),
-    //         mat3x3<f32>(
-    //             cos(45.0), sin(45.0), 0.0,
-    //             -sin(45.0), cos(45.0), 0.0,
-    //             0.0, 0.0, 1.0
-    //         )
-    //     ),
-    //     Cube(
-    //         1,
-    //         Material(
-    //             vec3<f32>(0.0),
-    //             vec3<f32>(1.0),
-    //             0.0,
-    //             0.0
-    //         ),
-    //         vec3<f32>(2.0, -1, -3.0),
-    //         mat3x3<f32>(
-    //             cos(45.0), sin(45.0), 0.0,
-    //             -sin(45.0), cos(45.0), 0.0,
-    //             0.0, 0.0, 1.0
-    //         )
-    //     ),
 
-    //     Cube(
-    //         1,
-    //         Material(
-    //             vec3<f32>(0.0),
-    //             vec3<f32>(1.0),
-    //             0.0,
-    //             0.0
-    //         ),
-    //         vec3<f32>(1, 2.5, -4.0),
-    //         mat3x3<f32>(
-    //             cos(-25.0), sin(-25.0), 0.0,
-    //             -sin(-25.0), cos(-25.0), 0.0,
-    //             0.0, 0.0, 1.0
-    //         )
-    //     ),
-    // );
 
-    for (var i = 0; i < 2; i++) {
-        let int = box_int(ro, rd, b_voxels[i]);
 
-        if int.is_intersected && int.fraction < min_dist {
-            min_dist = int.fraction;
-            out.normal = int.normal;
-            out.material = b_voxels[i].material;
-        }
-    }
 
-    // var p = ro;
 
-    // for (var i = 0; i < 100; i++) {
-    //     let d = voxel_dist(p, sphs[0]);
 
-    //     if d > 50 {
-    //         out.is_intersected = false;
-    //         return out;
-    //     }
 
-    //     p += rd * d;
 
-    //     if d < 0.001 {
-    //         out.is_intersected = true;
-    //         out.fraction = p;
-    //         out.material = sphs[0].material;
-    //         out.normal = vec3<f32>
-    //     }
-    // }
 
-    out.fraction = min_dist;
-    out.is_intersected = FAR_DISTANCE != min_dist;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//! include "uniforms"
+
+@vertex
+fn vs_main(model: VertexInput) -> VertexOutput {
+    var out: VertexOutput;
+
+    out.clip_position = vec4<f32>(model.position, 1.0);
+    out.uv = vec2<f32>(model.position.x, model.position.y);
 
     return out;
 }
 
-const MAX_DEPTH = 4;
+//! endif
+//! include "vertex"
 
-//! ifndef _eng_rand_wgsl
-//! define _eng_rand_wgsl ""
-
-
-
-
-
+//! endif
+//! include "header"
+//! ifndef _rand_wgsl
+//! define _rand_wgsl ""
 
 
 
@@ -404,7 +267,187 @@ const MAX_DEPTH = 4;
 
 
 
-//! include "eng_header"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//! include "header"
 
 var<private> seed: f32 = 8498201.443902;
 
@@ -434,21 +477,869 @@ fn rand4(_co: vec2<f32>) -> vec4<f32> {
 }
 
 //! endif
-//! include "eng_rand"
+//! include "rand"
+//! ifndef _render_wgsl
+//! define _render_wgsl ""
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//! include "render_def"
+//! ifndef _render_ray_casting_wgsl
+//! define _render_ray_casting_wgsl ""
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//! include "render_def"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//! include "uniforms"
+
+//! define FAR_DISTANCE "1000000.0"
+
+fn cast_ray(ro: vec3<f32>, rd: vec3<f32>) -> IntersectInfo {
+    var out: IntersectInfo;
+var min_dist = 1000000.0;
+
+    for (var i = 0; i < 2; i++) {
+        let int = box_int(ro, rd, b_voxels[i]);
+
+        if int.is_intersected && int.fraction < min_dist {
+            min_dist = int.fraction;
+            out.normal = int.normal;
+            out.material = b_voxels[i].material;
+        }
+    }
+
+    out.fraction = min_dist;
+out.is_intersected = 1000000.0 != min_dist;
+
+    return out;
+}
+
+fn get_color_with_ray_casting(ro: vec3<f32>, rd: vec3<f32>) -> vec3<f32> {
+    let hit = cast_ray(ro, rd);
+
+    if hit.is_intersected {
+        return hit.material.reflectance;
+    } else {
+        return vec3<f32>(0.0);
+    }
+}
+ 
+//! endif
+//! include "render_ray_casting"
+//! ifndef _render_ray_trasing_wgsl
+//! define _render_ray_trasing_wgsl ""
+
+//! define MAX_DEPTH "4"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//! include "render_def"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//! include "render_ray_casting"
+//! ifndef _math_wgsl
+//! define _math_wgsl ""
+
+//! define PI "3.141592653"
+
+//! endif
+//! include "math"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//! include "rand"
+
+fn rand_point(rand: vec2<f32>) -> vec3<f32> {
+    let cos_theta = sqrt(1.0 - rand.x);
+    let sin_theta = sqrt(rand.x);
+let phi = 2.0 * 3.141592653 * rand.y;
+
+    return vec3<f32>(
+        cos(phi) * sin_theta,
+        sin(phi) * sin_theta,
+        cos_theta
+    );
+}
+
+fn normal_point(rand: vec2<f32>, n: vec3<f32>) -> vec3<f32> {
+    let v = rand_point(rand);
+
+    if dot(v, n) < 0.0 {
+        return -v;
+    }
+
+    return v;
+}
 
 fn trace_ray(_ro: vec3<f32>, _rd: vec3<f32>, uv: vec2<f32>) -> vec3<f32> {
-//    var L = vec3<f32>(rand_noise(uv), rand_noise(uv), rand_noise(uv)) * vec3<f32>(uv, 0.0);
     var L = vec3<f32>(0.0);
     var F = vec3<f32>(1.0);
 
     var ro = _ro;
     var rd = _rd;
 
-    //! define ray_trasing ""
-
-    //! ifdef ray_trasing
-    for (var i = 0; i < MAX_DEPTH; i++) {
-        let hit = cast_ray(ro, rd, uv);
+for (var i = 0; i < 4; i++) {
+        let hit = cast_ray(ro, rd);
 
         if hit.is_intersected {
             var new_ro = ro + hit.fraction * rd;
@@ -478,172 +1369,22 @@ fn trace_ray(_ro: vec3<f32>, _rd: vec3<f32>, uv: vec2<f32>) -> vec3<f32> {
     }
 
     return L;
-    //! endif
-}
-
-const PI = 3.14;
-
-fn rand_point(rand: vec2<f32>) -> vec3<f32> {
-    let cos_theta = sqrt(1.0 - rand.x);
-    let sin_theta = sqrt(rand.x);
-    let phi = 2.0 * PI * rand.y;
-
-    return vec3<f32>(
-        cos(phi) * sin_theta,
-        sin(phi) * sin_theta,
-        cos_theta
-    );
-}
-
-fn normal_point(rand: vec2<f32>, n: vec3<f32>) -> vec3<f32> {
-    let v = rand_point(rand);
-
-    if dot(v, n) < 0.0 {
-        return -v;
-    }
-
-    return v;
 }
 
 //! endif
-//! include "ray_trasing"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//! include "eng_header"
-//! ifndef _eng_vertex_wgsl
-//! define _eng_vertex_wgsl ""
-
-@vertex
-fn vs_main(model: VertexInput) -> VertexOutput {
-    var out: VertexOutput;
-
-    out.clip_position = vec4<f32>(model.position, 1.0);
-    out.uv = vec2<f32>(model.position.x, model.position.y);
-
-    return out;
-}
+//! include "render_ray_trasing"
 
 //! endif
-//! include "eng_vertex"
+//! include "render"
 
 
 
 
 
+//! include "math"
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//! include "eng_rand"
+//! endif
+//! include "std"
 
 //! define SAMPLE_COUNT "10"
 
@@ -652,20 +1393,8 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
     let uv = in.uv * u_meta_data.res / u_meta_data.res.y;
     
     var ray_orig = u_camera.pos.xyz;
-
-    // let angle = f32(u_time.time) / 100.0;
-    // let ray_dir = normalize(vec3<f32>(1.0, uv)) * mat3x3<f32>(
-    //     cos(u_cam_rot.matrix.x), sin(u_cam_rot.matrix.x), 0.0,
-    //     -sin(u_cam_rot.matrix.x), cos(u_cam_rot.matrix.x), 0.0,
-    //     0.0, 0.0, 1.0
-    // );
-
     let ray_dir = (normalize(vec3<f32>(1.0, uv)) * u_camera.matrix).xyz;
 
-    // let ray_dir = normalize(vec3<f32>(1.0, uv));
-
-    // seed = f32(u_time.time);
-    // var color = trace_ray(ray_orig, ray_dir, uv + 1);
     var color = vec3<f32>(0.0);
 
 for (var sample = 0; sample < 10; sample++) {

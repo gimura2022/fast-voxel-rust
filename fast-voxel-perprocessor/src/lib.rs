@@ -289,7 +289,9 @@ impl ShaderPreprocessor {
     pub fn new(shader_sources: HashMap<String, String>) -> Self {
         let mut shader_sources = shader_sources;
 
-        shader_sources.insert("std_rand".to_string(), include_str!("shader_std/std_rand.wgsl").to_string());
+        for (std_file_name, std_file_source) in fast_voxel_lib::SHADER_STD.into_iter() {
+            shader_sources.insert(std_file_name.to_string(), std_file_source.to_string());
+        }
 
         Self {
             defines: HashMap::new(),
@@ -315,7 +317,7 @@ impl ShaderPreprocessor {
     /// println!("Preprocessed source: {}", preprocessed);
     /// ```
     pub fn preprocess(&mut self) -> Result<String, PreprocessorErrorType> {
-        self.preprocess_impl("main".to_string(), "compiler".to_string())
+        self.preprocess_impl("main".to_string(), "__compiler_main".to_string())
     }
 
     fn preprocess_impl(&mut self, shader_name: String, root_name: String) -> Result<String, PreprocessorErrorType> {

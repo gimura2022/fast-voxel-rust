@@ -19,6 +19,7 @@ fast-voxel-perprocessor = { path = "fast-voxel-perprocessor" }
 [dependencies]
 fast-voxel-lib = { path = "fast-voxel-lib" }
 fast-voxel-perprocessor = { path = "fast-voxel-perprocessor" }
+
 pollster = "0.3.0"
 cfg-if = "1"
 env_logger = "0.11.3"
