@@ -127,16 +127,16 @@ impl VoxelTree {
                     opacity: object["material"]["opacity"].as_f64().unwrap() as f32,
                 },
                 childs: [
-                    object["childs"].as_array().unwrap()[0].as_f64().unwrap() as f32,
-                    object["childs"].as_array().unwrap()[1].as_f64().unwrap() as f32,
-                    object["childs"].as_array().unwrap()[2].as_f64().unwrap() as f32,
-                    object["childs"].as_array().unwrap()[3].as_f64().unwrap() as f32,
-                    object["childs"].as_array().unwrap()[4].as_f64().unwrap() as f32,
-                    object["childs"].as_array().unwrap()[5].as_f64().unwrap() as f32,
-                    object["childs"].as_array().unwrap()[6].as_f64().unwrap() as f32,
-                    object["childs"].as_array().unwrap()[7].as_f64().unwrap() as f32,
+                    object["childs"].as_array().unwrap()[0].as_u64().unwrap() as f32,
+                    object["childs"].as_array().unwrap()[1].as_u64().unwrap() as f32,
+                    object["childs"].as_array().unwrap()[2].as_u64().unwrap() as f32,
+                    object["childs"].as_array().unwrap()[3].as_u64().unwrap() as f32,
+                    object["childs"].as_array().unwrap()[4].as_u64().unwrap() as f32,
+                    object["childs"].as_array().unwrap()[5].as_u64().unwrap() as f32,
+                    object["childs"].as_array().unwrap()[6].as_u64().unwrap() as f32,
+                    object["childs"].as_array().unwrap()[7].as_u64().unwrap() as f32,
                 ],
-                is_leaf: object["is_leaf"].as_f64().unwrap() as f32,
+                is_leaf: object["is_leaf"].as_u64().unwrap() as f32,
                 _offset: [0.0; 14]
             })
         }
@@ -197,7 +197,6 @@ impl VoxelTree {
 
                     out.append(&mut vec![0, 0, 0, 0]);
                     out.append(&mut vec![0, 0, 0, 0]);
-                    out.append(&mut vec![0, 0, 0, 0]);
 
                     out.append(&mut cast_slice(&[exp.childs[0]]).to_owned());
                     out.append(&mut cast_slice(&[exp.childs[1]]).to_owned());
@@ -210,6 +209,7 @@ impl VoxelTree {
 
                     out.append(&mut cast_slice(&[exp.is_leaf]).to_owned());
 
+                    out.append(&mut vec![0, 0, 0, 0]);
                     out.append(&mut vec![0, 0, 0, 0]);
                     out.append(&mut vec![0, 0, 0, 0]);
                 }

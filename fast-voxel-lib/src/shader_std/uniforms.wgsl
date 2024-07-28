@@ -26,4 +26,8 @@ struct CameraUniform {
 @group(1) @binding(0) var<uniform> u_meta_data: MetaDataUniform;
 @group(2) @binding(0) var<storage, read> b_voxels: array<Cube>;
 
+fn get_voxel(i: u32) -> Cube {
+    return b_voxels[i];
+}
+
 //! endif
