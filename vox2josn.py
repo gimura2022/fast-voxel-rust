@@ -3,6 +3,12 @@ import midvoxio.vox
 import midvoxio.voxio
 import json
 
+class Node:
+    def __init__(self, size) -> None:
+        self.size = size
+        self.childs = None
+        self.material = None\
+    
 FILE = "test.vox"
 voxels = midvoxio.voxio.get_vox(FILE).voxels
 print(len(voxels[0]))

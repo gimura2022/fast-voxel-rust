@@ -9,6 +9,7 @@ struct Cube {
     material: Material,
     childs: array<f32, 8>,
     is_leaf: f32,
+    is_none: f32
 }
 
 struct Material {

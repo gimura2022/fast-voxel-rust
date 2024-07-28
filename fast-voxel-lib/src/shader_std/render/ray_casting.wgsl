@@ -33,7 +33,7 @@ fn cast_ray(ro: vec3<f32>, rd: vec3<f32>) -> IntersectInfo {
                 let child_box = get_voxel(u32(box.childs[i]));
                 let child_int = box_int(ro, rd, child_box);
 
-                if child_int.is_intersected && child_int.fraction < child_min_dist {
+                if child_int.is_intersected && child_int.fraction < child_min_dist && child_box.is_none != 1.0 {
                     child_min_dist = child_int.fraction;
                     box_out = child_box;
                 }

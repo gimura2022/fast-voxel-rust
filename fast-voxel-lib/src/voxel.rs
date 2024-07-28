@@ -26,7 +26,7 @@ impl VoxelTree {
 
         let uniform_buffer = app.device.create_buffer_init(&BufferInitDescriptor {
             label: Some("Camera uniform (buffer)"),
-            contents: vec![0; max_nodes * 44 * 4].as_slice(),
+            contents: vec![0; max_nodes * 45 * 4].as_slice(),
             usage: BufferUsages::STORAGE | BufferUsages::COPY_DST
         });
 
@@ -137,6 +137,7 @@ impl VoxelTree {
                     object["childs"].as_array().unwrap()[7].as_u64().unwrap() as f32,
                 ],
                 is_leaf: object["is_leaf"].as_u64().unwrap() as f32,
+                is_none: object["is_none"].as_u64().unwrap() as f32,
                 _offset: [0.0; 14]
             })
         }
@@ -208,8 +209,8 @@ impl VoxelTree {
                     out.append(&mut cast_slice(&[exp.childs[7]]).to_owned());
 
                     out.append(&mut cast_slice(&[exp.is_leaf]).to_owned());
+                    out.append(&mut cast_slice(&[exp.is_none]).to_owned());
 
-                    out.append(&mut vec![0, 0, 0, 0]);
                     out.append(&mut vec![0, 0, 0, 0]);
                     out.append(&mut vec![0, 0, 0, 0]);
                 }
@@ -255,5 +256,6 @@ pub struct CompiledUniform {
     pub material: MaterialUniform,
     pub childs: [f32; 8],
     pub is_leaf: f32,
+    pub is_none: f32,
     pub _offset: [f32; 14]
 }
