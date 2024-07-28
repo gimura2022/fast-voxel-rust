@@ -10,7 +10,7 @@ fn cast_ray(ro: vec3<f32>, rd: vec3<f32>) -> IntersectInfo {
     var out: IntersectInfo;
     //! insert "var min_dist = FAR_DISTANCE;"
 
-    for (var i = 0; i < 3; i++) {
+    for (var i = 0; i < 2629; i++) {
         let int = box_int(ro, rd, b_voxels[i]);
 
         if int.is_intersected && int.fraction < min_dist {

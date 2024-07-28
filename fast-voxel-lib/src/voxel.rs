@@ -1,3 +1,5 @@
+use std::fs;
+
 use cgmath::*;
 use util::BufferInitDescriptor;
 use wgpu::*;
@@ -12,12 +14,6 @@ pub struct VoxelSpace {
 }
 
 pub struct VoxelTree {
-    // root_node: Node,
-    // rotation: Matrix4<f32>,
-    // position: Vector3<f32>,
-
-    // size: usize,
-
     uniform: Vec<CompiledUniform>,
     uniform_buffer: Buffer,
     uniform_bind_group_layout: BindGroupLayout,
@@ -25,70 +21,12 @@ pub struct VoxelTree {
 }
 
 impl VoxelTree {
-    pub fn new(app: &App, binding: u32) -> Self {
-        let uniform = vec![
-            CompiledUniform {
-                position: (0.0, 0.0, 0.0).into(),
-                rotation: Matrix3::identity().into(),
-                size: 10.0,
-                material: MaterialUniform {
-                    emmitance: (0.0, 0.0, 0.0).into(),
-                    reflectance: (1.0, 1.0, 1.0).into(),
-                    roughness: 1.0,
-                    opacity: 0.0,
-                },
-                childs: [!0 as f32; 8],
-                is_leaf: 1.0,
-                _offset: [0.0; 14]
-            },
-            CompiledUniform {
-                position: (0.0, -3.0, 20.0).into(),
-                rotation: Matrix3::identity().into(),
-                size: 1.0,
-                material: MaterialUniform {
-                    emmitance: (1.0, 0.0, 0.0).into(),
-                    reflectance: (0.0, 0.0, 0.0).into(),
-                    roughness: 0.0,
-                    opacity: 0.0,
-                },
-                childs: [!0 as f32; 8],
-                is_leaf: 1.0,
-                _offset: [0.0; 14]
-            },
-            CompiledUniform {
-                position: (0.0, 3.0, 20.0).into(),
-                rotation: Matrix3::identity().into(),
-                size: 1.0,
-                material: MaterialUniform {
-                    emmitance: (0.0, 0.0, 1.0).into(),
-                    reflectance: (0.0, 0.0, 0.0).into(),
-                    roughness: 0.0,
-                    opacity: 0.0,
-                },
-                childs: [!0 as f32; 8],
-                is_leaf: 1.0,
-                _offset: [0.0; 14]
-            },
-        ];
+    pub fn new(app: &App, binding: u32, max_nodes: usize) -> Self {
+        let uniform = vec![];
 
         let uniform_buffer = app.device.create_buffer_init(&BufferInitDescriptor {
             label: Some("Camera uniform (buffer)"),
-            // contents: bytemuck::cast_slice(uniform.as_slice()),
-            contents: {
-                let range = (0..132).into_iter();
-                let mut out = Vec::<u8>::new();
-
-                for i in range {
-                    let bytes = bytemuck::cast_slice::<f32, u8>(&[i as f32]).to_owned();
-
-                    out.push(bytes[0]);
-                    out.push(bytes[1]);
-                    out.push(bytes[2]);
-                    out.push(bytes[3]);
-                }
-
-                out
-            }.as_slice(),
+            contents: vec![0; max_nodes * 44 * 4].as_slice(),
             usage: BufferUsages::STORAGE | BufferUsages::COPY_DST
         });
 
@@ -141,6 +79,69 @@ impl VoxelTree {
         self.update_buffers(app);
     }
 
+    pub fn load(&mut self, file: String) {
+        let file = fs::read_to_string(file)
+            .expect("Error to load scene file");
+
+        let json: serde_json::Value = serde_json::from_str(file.as_str())
+            .expect("Error to load scene file");
+
+        for object in json.as_array().unwrap() {
+            self.uniform.push(CompiledUniform {
+                position: [
+                    object["pos"].as_array().unwrap()[0].as_f64().unwrap() as f32,
+                    object["pos"].as_array().unwrap()[1].as_f64().unwrap() as f32,
+                    object["pos"].as_array().unwrap()[2].as_f64().unwrap() as f32,
+                ],
+                rotation: [
+                    [
+                        object["rot"].as_array().unwrap()[0][0].as_f64().unwrap() as f32,
+                        object["rot"].as_array().unwrap()[0][1].as_f64().unwrap() as f32,
+                        object["rot"].as_array().unwrap()[0][2].as_f64().unwrap() as f32,
+                    ],
+                    [
+                        object["rot"].as_array().unwrap()[1][0].as_f64().unwrap() as f32,
+                        object["rot"].as_array().unwrap()[1][1].as_f64().unwrap() as f32,
+                        object["rot"].as_array().unwrap()[1][2].as_f64().unwrap() as f32,
+                    ],
+                    [
+                        object["rot"].as_array().unwrap()[2][0].as_f64().unwrap() as f32,
+                        object["rot"].as_array().unwrap()[2][1].as_f64().unwrap() as f32,
+                        object["rot"].as_array().unwrap()[2][2].as_f64().unwrap() as f32,
+                    ]
+                ],
+                size: object["size"].as_f64().unwrap() as f32,
+                material: MaterialUniform {
+                    emmitance: [
+                        object["material"]["emmitance"].as_array().unwrap()[0].as_f64().unwrap() as f32,
+                        object["material"]["emmitance"].as_array().unwrap()[1].as_f64().unwrap() as f32,
+                        object["material"]["emmitance"].as_array().unwrap()[2].as_f64().unwrap() as f32,
+                    ],
+                    reflectance: [
+                        object["material"]["reflectance"].as_array().unwrap()[0].as_f64().unwrap() as f32,
+                        object["material"]["reflectance"].as_array().unwrap()[1].as_f64().unwrap() as f32,
+                        object["material"]["reflectance"].as_array().unwrap()[2].as_f64().unwrap() as f32,
+                    ],
+
+                    roughness: object["material"]["roughness"].as_f64().unwrap() as f32,
+                    opacity: object["material"]["opacity"].as_f64().unwrap() as f32,
+                },
+                childs: [
+                    object["childs"].as_array().unwrap()[0].as_f64().unwrap() as f32,
+                    object["childs"].as_array().unwrap()[1].as_f64().unwrap() as f32,
+                    object["childs"].as_array().unwrap()[2].as_f64().unwrap() as f32,
+                    object["childs"].as_array().unwrap()[3].as_f64().unwrap() as f32,
+                    object["childs"].as_array().unwrap()[4].as_f64().unwrap() as f32,
+                    object["childs"].as_array().unwrap()[5].as_f64().unwrap() as f32,
+                    object["childs"].as_array().unwrap()[6].as_f64().unwrap() as f32,
+                    object["childs"].as_array().unwrap()[7].as_f64().unwrap() as f32,
+                ],
+                is_leaf: object["is_leaf"].as_f64().unwrap() as f32,
+                _offset: [0.0; 14]
+            })
+        }
+    }
+
     pub fn update_buffers(&self, app: &App) {
         app.queue.write_buffer(
             &self.uniform_buffer,
@@ -148,7 +149,7 @@ impl VoxelTree {
             {
                 let mut out = Vec::<u8>::new();
 
-                for (i, exp) in (&self.uniform).into_iter().enumerate() {
+                for exp in (&self.uniform).into_iter() {
                     out.append(&mut cast_slice(&[exp.position[0]]).to_owned());
                     out.append(&mut cast_slice(&[exp.position[1]]).to_owned());
                     out.append(&mut cast_slice(&[exp.position[2]]).to_owned());
@@ -222,11 +223,6 @@ impl VoxelTree {
     }
 }
 
-pub struct Node {
-    material: Option<MaterialUniform>,
-    childs: Option<Box<Node>>
-}
-
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 #[derive(Zeroable, Pod)]
@@ -235,6 +231,17 @@ pub struct MaterialUniform {
     pub reflectance: [f32; 3],
     pub roughness: f32,
     pub opacity: f32
+}
+
+impl Default for MaterialUniform {
+    fn default() -> Self {
+        Self {
+            emmitance: [1.0, 1.0, 1.0],
+            reflectance: [1.0, 1.0, 1.0],
+            roughness: 0.0,
+            opacity: 0.0,
+        }
+    }
 }
 
 #[repr(C)]
