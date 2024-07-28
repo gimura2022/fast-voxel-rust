@@ -180,7 +180,10 @@ pub struct CameraController {
     is_left_rot_pressed: bool,
     is_right_rot_pressed: bool,
     is_up_rot_pressed: bool,
-    is_down_rot_pressed: bool
+    is_down_rot_pressed: bool,
+
+    is_up_pressed: bool,
+    is_down_pressed: bool,
 }
 
 impl CameraController {
@@ -196,7 +199,10 @@ impl CameraController {
             is_left_rot_pressed: false,
             is_right_rot_pressed: false,
             is_down_rot_pressed: false,
-            is_up_rot_pressed: false
+            is_up_rot_pressed: false,
+
+            is_up_pressed: false,
+            is_down_pressed: false,
         }
     }
 
@@ -247,6 +253,15 @@ impl CameraController {
                         true
                     }
 
+                    winit::keyboard::KeyCode::KeyZ => {
+                        self.is_down_pressed = is_pressed;
+                        true
+                    }
+                    winit::keyboard::KeyCode::Space => {
+                        self.is_up_pressed = is_pressed;
+                        true
+                    }
+
                     _ => false,
                 }
             }
@@ -271,6 +286,13 @@ impl CameraController {
         }
         if self.is_down_rot_pressed {
             camera.rot.y -= self.speed / 2.0 * app.delta_time as f32;
+        }
+
+        if self.is_up_pressed {
+            camera.pos.z += self.speed * app.delta_time as f32;
+        }
+        if self.is_down_pressed {
+            camera.pos.z -= self.speed * app.delta_time as f32;
         }
 
         if self.is_forward_pressed {

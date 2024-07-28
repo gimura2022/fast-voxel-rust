@@ -32,7 +32,21 @@ impl VoxelTree {
                 rotation: Matrix3::identity().into(),
                 size: 10.0,
                 material: MaterialUniform {
-                    emmitance: (1.0, 1.0, 1.0).into(),
+                    emmitance: (0.0, 0.0, 0.0).into(),
+                    reflectance: (1.0, 1.0, 1.0).into(),
+                    roughness: 1.0,
+                    opacity: 0.0,
+                },
+                childs: [!0 as f32; 8],
+                is_leaf: 1.0,
+                _offset: [0.0; 14]
+            },
+            CompiledUniform {
+                position: (0.0, -3.0, 20.0).into(),
+                rotation: Matrix3::identity().into(),
+                size: 1.0,
+                material: MaterialUniform {
+                    emmitance: (1.0, 0.0, 0.0).into(),
                     reflectance: (0.0, 0.0, 0.0).into(),
                     roughness: 0.0,
                     opacity: 0.0,
@@ -42,13 +56,13 @@ impl VoxelTree {
                 _offset: [0.0; 14]
             },
             CompiledUniform {
-                position: (0.0, 0.0, -20.0).into(),
+                position: (0.0, 3.0, 20.0).into(),
                 rotation: Matrix3::identity().into(),
                 size: 1.0,
                 material: MaterialUniform {
-                    emmitance: (0.0, 0.0, 0.0).into(),
-                    reflectance: (1.0, 1.0, 1.0).into(),
-                    roughness: 0.5,
+                    emmitance: (0.0, 0.0, 1.0).into(),
+                    reflectance: (0.0, 0.0, 0.0).into(),
+                    roughness: 0.0,
                     opacity: 0.0,
                 },
                 childs: [!0 as f32; 8],
@@ -61,7 +75,7 @@ impl VoxelTree {
             label: Some("Camera uniform (buffer)"),
             // contents: bytemuck::cast_slice(uniform.as_slice()),
             contents: {
-                let range = (0..88).into_iter();
+                let range = (0..132).into_iter();
                 let mut out = Vec::<u8>::new();
 
                 for i in range {

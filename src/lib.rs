@@ -27,7 +27,7 @@ pub async fn run() {
             shdaer_source: include_str!("../target/compiled.wgsl").to_string()
         }),
         camera: (
-            (-30.0, 0.0, 0.0).into(),
+            (-10.0, 0.0, 20.0).into(),
             (0.0, 0.0, 0.0).into()
         )
     });
