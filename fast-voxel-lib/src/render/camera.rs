@@ -158,6 +158,7 @@ impl Camera {
 
         CameraUniform {
             rot: {
+                // FIXME: fix camera rotation
                 Matrix3::identity() *
                 Matrix3::from_angle_x(Rad(-self.rot.x)) *
                 Matrix3::from_angle_y(Rad(-self.rot.y)) *
@@ -254,6 +255,8 @@ impl CameraController {
     }
 
     pub fn handle_camera(&self, camera: &mut Camera, app: &App) {
+        // FIXME: fix camera movement
+
         let sin_az = camera.rot.z.sin();
         let cos_az = camera.rot.z.cos();
 

@@ -41,27 +41,27 @@ impl VoxelTree {
                 is_leaf: 1.0,
                 _offset: [0.0; 14]
             },
-            // CompiledUniform {
-            //     position: (0.0, 0.0, -20.0).into(),
-            //     rotation: Matrix3::identity().into(),
-            //     size: 10.0,
-            //     material: MaterialUniform {
-            //         emmitance: (0.0, 0.0, 0.0).into(),
-            //         reflectance: (1.0, 1.0, 1.0).into(),
-            //         roughness: 0.5,
-            //         opacity: 0.0,
-            //     },
-            //     childs: [!0 as f32; 8],
-            //     is_leaf: 1.0,
-            //     _offset: [0.0; 14]
-            // }
+            CompiledUniform {
+                position: (0.0, 0.0, -20.0).into(),
+                rotation: Matrix3::identity().into(),
+                size: 1.0,
+                material: MaterialUniform {
+                    emmitance: (0.0, 0.0, 0.0).into(),
+                    reflectance: (1.0, 1.0, 1.0).into(),
+                    roughness: 0.5,
+                    opacity: 0.0,
+                },
+                childs: [!0 as f32; 8],
+                is_leaf: 1.0,
+                _offset: [0.0; 14]
+            },
         ];
 
         let uniform_buffer = app.device.create_buffer_init(&BufferInitDescriptor {
             label: Some("Camera uniform (buffer)"),
             // contents: bytemuck::cast_slice(uniform.as_slice()),
             contents: {
-                let range = (0..44).into_iter();
+                let range = (0..88).into_iter();
                 let mut out = Vec::<u8>::new();
 
                 for i in range {
@@ -194,7 +194,13 @@ impl VoxelTree {
                     out.append(&mut cast_slice(&[exp.childs[7]]).to_owned());
 
                     out.append(&mut cast_slice(&[exp.is_leaf]).to_owned());
+
+                    out.append(&mut vec![0, 0, 0, 0]);
+                    out.append(&mut vec![0, 0, 0, 0]);
                 }
+
+                out.pop(); out.pop(); out.pop(); out.pop();
+                out.pop(); out.pop(); out.pop(); out.pop();
 
                 out
             }.as_slice()
