@@ -75,7 +75,7 @@
         "material": {
             "emmitance": [1.0, 0.0, 1.0],
             "reflectance": [1.0, 1.0, 1.0],
-            "roughness": 0.0,
+            "roughness": 1.0,
             "opacity": 0.0
         },
         "childs": [
@@ -159,7 +159,7 @@
         "material": {
             "emmitance": [0.0, 0.0, 0.0],
             "reflectance": [1.0, 1.0, 1.0],
-            "roughness": 0.0,
+            "roughness": 1.0,
             "opacity": 0.0
         },
         "childs": [

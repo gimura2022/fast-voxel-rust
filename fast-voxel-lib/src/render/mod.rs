@@ -187,8 +187,8 @@ impl Render {
             _offset: [0; 4]
         }, 0, app);
 
-        let mut voxel_tree = VoxelTree::new(app, 0, 9);
-        voxel_tree.load("scene.json".to_string());
+        let mut voxel_tree = VoxelTree::new(app, 0, 65);
+        voxel_tree.load("scene_vox.json".to_string());
        
         let render_pipeline_layout = app.device.create_pipeline_layout(&PipelineLayoutDescriptor {
             label: Some("Render pipeline layout"),
