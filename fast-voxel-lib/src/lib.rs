@@ -10,19 +10,6 @@ use winit::{
     dpi::*, event::{ElementState, Event, KeyEvent, WindowEvent}, event_loop::EventLoop, keyboard::{KeyCode, PhysicalKey}, window::*
 };
 
-pub static SHADER_STD: phf::Map<&'static str, &'static str> = phf::phf_map! {
-    "rand" => include_str!("shader_std/rand.wgsl"),
-    "header" => include_str!("shader_std/header.wgsl"),
-    "std" => include_str!("shader_std/std.wgsl"),
-    "uniforms" => include_str!("shader_std/uniforms.wgsl"),
-    "vertex" => include_str!("shader_std/vertex.wgsl"),
-    "math" => include_str!("shader_std/math.wgsl"),
-    "render" => include_str!("shader_std/render/render.wgsl"),
-    "render_def" => include_str!("shader_std/render/def.wgsl"),
-    "render_ray_casting" => include_str!("shader_std/render/ray_casting.wgsl"),
-    "render_ray_trasing" => include_str!("shader_std/render/ray_trasing.wgsl"),
-};
-
 #[cfg(target_arch="wasm32")]
 use wasm_bindgen::prelude::*;
 

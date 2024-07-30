@@ -1,7 +1,7 @@
 //! ifndef _vertex_wgsl
 //! define _vertex_wgsl ""
 
-//! include "uniforms"
+//! include "std" "uniforms.wgsl"
 
 @vertex
 fn vs_main(model: VertexInput) -> VertexOutput {

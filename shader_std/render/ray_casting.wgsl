@@ -1,16 +1,16 @@
 //! ifndef _render_ray_casting_wgsl
 //! define _render_ray_casting_wgsl ""
 
-//! include "render_def"
-//! include "uniforms"
+//! include "std" "render_def.wgsl"
+//! include "std" "uniforms.wgsl"
 
 //! define FAR_DISTANCE "1000000.0"
 
 fn cast_ray(ro: vec3<f32>, rd: vec3<f32>) -> IntersectInfo {
     var out: IntersectInfo;
-    //! insert "var min_dist = FAR_DISTANCE;"
+    var min_dist = FAR_DISTANCE;
 
-    var box = b_voxels[64];
+    var box = b_voxels[72];
 
     while true {
         let int = box_int(ro, rd, box);
@@ -26,7 +26,7 @@ fn cast_ray(ro: vec3<f32>, rd: vec3<f32>) -> IntersectInfo {
 
             break;
         } else {
-            //! insert "var child_min_dist = FAR_DISTANCE;"
+            var child_min_dist = FAR_DISTANCE;
             var box_out = box;
 
             for (var i = 0; i < 8; i++) {
@@ -41,7 +41,7 @@ fn cast_ray(ro: vec3<f32>, rd: vec3<f32>) -> IntersectInfo {
             
             box = box_out;
 
-            //! insert "if child_min_dist == FAR_DISTANCE {"
+            if child_min_dist == FAR_DISTANCE {
                 out.is_intersected = false;
                 break;
             }
@@ -53,20 +53,6 @@ fn cast_ray(ro: vec3<f32>, rd: vec3<f32>) -> IntersectInfo {
     }
 
     return out;
-
-    // for (var i = 0; i < 1; i++) {
-
-    //     if int.is_intersected && int.fraction < min_dist {
-    //         min_dist = int.fraction;
-    //         out.normal = int.normal;
-    //         out.material = b_voxels[i].material;
-    //     }
-    // }
-
-    // out.fraction = min_dist;
-    // //! insert "out.is_intersected = FAR_DISTANCE != min_dist;"
-
-    // return out;
 }
 
 fn get_color_with_ray_casting(ro: vec3<f32>, rd: vec3<f32>) -> vec3<f32> {

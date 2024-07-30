@@ -1,4 +1,4 @@
-//! include "std"
+//! include "std" "std.wgsl"
 
 //! define SAMPLE_COUNT "10"
 
@@ -13,13 +13,13 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
 
     var color = vec3<f32>(0.0);
 
-    //! insert "for (var sample = 0; sample < SAMPLE_COUNT; sample++) {"
+    for (var sample = 0; sample < SAMPLE_COUNT; sample++) {
         seed = (f32(sample) + uv * 18.23189).x;
         let tmp_color = trace_ray(ray_orig, ray_dir, uv + f32(sample) * 23.00231);
         color += tmp_color;
     }
 
-    //! insert "color /= f32(SAMPLE_COUNT);"
+    color /= f32(SAMPLE_COUNT);
 
     return vec4<f32>(color, 1.0);
 }

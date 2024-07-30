@@ -3,15 +3,15 @@
 
 //! define MAX_DEPTH "4"
 
-//! include "render_def"
-//! include "render_ray_casting"
-//! include "math"
-//! include "rand"
+//! include "std" "render_def.wgsl"
+//! include "std" "ray_casting.wgsl"
+//! include "std" "math.wgsl"
+//! include "std" "rand.wgsl"
 
 fn rand_point(rand: vec2<f32>) -> vec3<f32> {
     let cos_theta = sqrt(1.0 - rand.x);
     let sin_theta = sqrt(rand.x);
-    //! insert "let phi = 2.0 * PI * rand.y;"
+    let phi = 2.0 * PI * rand.y;
 
     return vec3<f32>(
         cos(phi) * sin_theta,
@@ -37,7 +37,7 @@ fn trace_ray(_ro: vec3<f32>, _rd: vec3<f32>, uv: vec2<f32>) -> vec3<f32> {
     var ro = _ro;
     var rd = _rd;
 
-    //! insert "for (var i = 0; i < MAX_DEPTH; i++) {"
+    for (var i = 0; i < MAX_DEPTH; i++) {
         let hit = cast_ray(ro, rd);
 
         if hit.is_intersected {

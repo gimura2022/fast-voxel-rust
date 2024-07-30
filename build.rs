@@ -1,24 +1,22 @@
 use std::{fs::File, io::Write};
 
-use fast_voxel_perprocessor::preprocess_dir;
+use gimura_preprocessor_lib::prelude::*;
 
-fn main() -> Result<(), ()> {
-    println!("cargo::rerun-if-changed=src/shaders");
+fn main() {
+    println!("cargo::rerun-if-changed=./src/shaders/");
+    println!("cargo::rerun-if-changed=./shaders_std/");
 
-    let preprocessed = preprocess_dir("src/shaders".to_string());
+    let preprocessor_options = PreprocessorOptions::default();
+    let mut preprocessor = Preporcessor::new(preprocessor_options);
+    
+    preprocessor.add_source("main".to_string(), CodeSource::from_path("./src/shaders/".to_string()));
+    preprocessor.add_source("std".to_string(), CodeSource::from_path("./shader_std/".to_string()));
 
-    match preprocessed {
-        Ok(source) => {
-            let mut file = File::create("target/compiled.wgsl")
-                .expect("Error to open file!");
+    let source = preprocessor.preprocess("main".to_string(), "main.wgsl".to_string());
 
-            file.write_all(source.as_bytes())
-                .expect("Error to write file!");
+    let mut file = File::create("target/compiled.wgsl")
+        .expect("Error to open file!");
 
-            Ok(())
-        },
-        Err(error) => {
-            panic!("{}", error.to_string());
-        },
-    }
+    file.write_all(source.as_bytes())
+        .expect("Error to write file!");
 }

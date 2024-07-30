@@ -20,7 +20,7 @@ struct CameraUniform {
     pos: vec3<f32>,
 }
 
-//! include "render_def"
+//! include "std" "render_def.wgsl"
 
 @group(0) @binding(0) var<uniform> u_camera: CameraUniform;
 @group(1) @binding(0) var<uniform> u_meta_data: MetaDataUniform;

@@ -1,7 +1,7 @@
 //! ifndef _rand_wgsl
 //! define _rand_wgsl ""
 
-//! include "header"
+//! include "std" "header.wgsl"
 
 var<private> seed: f32 = 8498201.443902;
 

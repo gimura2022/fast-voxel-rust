@@ -4,6 +4,7 @@ import midvoxio.voxio
 import json
 import sys
 import random
+import tqdm
 
 sys.setrecursionlimit(1000000000)
 
@@ -27,55 +28,55 @@ class Node:
 
         if self.childs == None:
             self.childs = [
-                Node(self.size / 2, True, True), # 1, 1, 1
-                Node(self.size / 2, True, True), # -1, -1, -1
-                Node(self.size / 2, True, True), # 1, -1, -1
-                Node(self.size / 2, True, True), # 1, 1, -1
-                Node(self.size / 2, True, True), # -1, 1, -1
-                Node(self.size / 2, True, True), # 1, -1, 1
-                Node(self.size / 2, True, True), # -1, -1, 1
-                Node(self.size / 2, True, True), # -1, 1, 1
+                Node(self.size // 2, True, True), # 1, 1, 1
+                Node(self.size // 2, True, True), # -1, -1, -1
+                Node(self.size // 2, True, True), # 1, -1, -1
+                Node(self.size // 2, True, True), # 1, 1, -1
+                Node(self.size // 2, True, True), # -1, 1, -1
+                Node(self.size // 2, True, True), # 1, -1, 1
+                Node(self.size // 2, True, True), # -1, -1, 1
+                Node(self.size // 2, True, True), # -1, 1, 1
             ]
 
         if (
-            pos[0] > self.size / 2 and
-            pos[1] > self.size / 2 and
-            pos[2] > self.size / 2
+            pos[0] > self.size // 2 and
+            pos[1] > self.size // 2 and
+            pos[2] > self.size // 2
         ): self.childs[0].add_voxel(pos)
         if (
-            pos[0] < self.size / 2 and
-            pos[1] < self.size / 2 and
-            pos[2] < self.size / 2
+            pos[0] < self.size // 2 and
+            pos[1] < self.size // 2 and
+            pos[2] < self.size // 2
         ): self.childs[1].add_voxel(pos)
         if (
-            pos[0] > self.size / 2 and
-            pos[1] < self.size / 2 and
-            pos[2] < self.size / 2
+            pos[0] > self.size // 2 and
+            pos[1] < self.size // 2 and
+            pos[2] < self.size // 2
         ): self.childs[2].add_voxel(pos)
         if (
-            pos[0] > self.size / 2 and
-            pos[1] > self.size / 2 and
-            pos[2] < self.size / 2
+            pos[0] > self.size // 2 and
+            pos[1] > self.size // 2 and
+            pos[2] < self.size // 2
         ): self.childs[3].add_voxel(pos)
         if (
-            pos[0] < self.size / 2 and
-            pos[1] > self.size / 2 and
-            pos[2] < self.size / 2
+            pos[0] < self.size // 2 and
+            pos[1] > self.size // 2 and
+            pos[2] < self.size // 2
         ): self.childs[4].add_voxel(pos)
         if (
-            pos[0] > self.size / 2 and
-            pos[1] < self.size / 2 and
-            pos[2] > self.size / 2
+            pos[0] > self.size // 2 and
+            pos[1] < self.size // 2 and
+            pos[2] > self.size // 2
         ): self.childs[5].add_voxel(pos)
         if (
-            pos[0] < self.size / 2 and
-            pos[1] < self.size / 2 and
-            pos[2] > self.size / 2
+            pos[0] < self.size // 2 and
+            pos[1] < self.size // 2 and
+            pos[2] > self.size // 2
         ): self.childs[6].add_voxel(pos)
         if (
-            pos[0] < self.size / 2 and
-            pos[1] > self.size / 2 and
-            pos[2] > self.size / 2
+            pos[0] < self.size // 2 and
+            pos[1] > self.size // 2 and
+            pos[2] > self.size // 2
         ): self.childs[7].add_voxel(pos)
 
     def get_data(self, pos):
@@ -101,7 +102,7 @@ class Node:
                     0, 0, 0, 0, 0, 0, 0, 0
                 ],
                 "is_leaf": 1,
-                "is_none": random.randint(0, 1)
+                "is_none": int(not self.is_none)
             })
 
             return len(data) - 1
@@ -146,10 +147,14 @@ root_node = Node(max(vox.sizes[0]), True, True)
 
 data = []
 
-for voxel in vox_list[0]:
+for voxel in tqdm.tqdm(vox_list[0]):
     root_node.add_voxel(voxel[:3])
 
+print("SVO calculated")
+
 root_node.compile([0.0, 0.0, 0.0])
+
+print("scene compiled")
 
 print(len(data))
 
