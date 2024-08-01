@@ -8,7 +8,9 @@
 //! include "std" "math.wgsl"
 //! include "std" "rand.wgsl"
 
-fn rand_point(rand: vec2<f32>) -> vec3<f32> {
+fn rand_point() -> vec3<f32> {
+    let rand = rand2();
+
     let cos_theta = sqrt(1.0 - rand.x);
     let sin_theta = sqrt(rand.x);
     let phi = 2.0 * PI * rand.y;
@@ -20,8 +22,8 @@ fn rand_point(rand: vec2<f32>) -> vec3<f32> {
     );
 }
 
-fn normal_point(rand: vec2<f32>, n: vec3<f32>) -> vec3<f32> {
-    let v = rand_point(rand);
+fn normal_point(n: vec3<f32>) -> vec3<f32> {
+    let v = rand_point();
 
     if dot(v, n) < 0.0 {
         return -v;
@@ -43,8 +45,8 @@ fn trace_ray(_ro: vec3<f32>, _rd: vec3<f32>, uv: vec2<f32>) -> vec3<f32> {
         if hit.is_intersected {
             var new_ro = ro + hit.fraction * rd;
             
-            let dist_dir = normal_point(rand2(uv), hit.normal);
-            let rand_vec = normalize(2.0 * rand3(uv) - 1.0);
+            let dist_dir = normal_point(hit.normal);
+            let rand_vec = normalize(2.0 * rand3() - 1.0);
             
             let tangent = cross(rand_vec, hit.normal);
             let bitangent = cross(hit.normal, tangent);

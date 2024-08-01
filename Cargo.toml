@@ -1,11 +1,11 @@
 [workspace]
 members = [
-    "fast-voxel-lib",
+    "wgsl-structure-converter",
 ]
 resolver = "2"
 
 [package]
-name = "fast-voxel-rust"
+name = "fast-voxel-rs"
 version = "0.1.0"
 edition = "2021"
 
@@ -16,13 +16,19 @@ crate-type = ["cdylib", "rlib"]
 gimura-preprocessor-lib = "0.1.2"
 
 [dependencies]
-fast-voxel-lib = { path = "fast-voxel-lib" }
-
-pollster = "0.3.0"
 cfg-if = "1"
-env_logger = "0.11.3"
+pollster = "0.3"
+
+once_cell = "1.19.0"
 winit = { version = "0.29", features = ["rwh_05"] }
-log = "0.4.22"
+env_logger = "0.10"
+log = "0.4"
+wgpu = "0.19.3"
+bytemuck = { version = "1.12", features = ["derive"] }
+regex = "1.10.5"
+cgmath = "0.18.0"
+phf = {version = "0.11.2", features = ["macros"]}
+serde_json = "1.0.120"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 console_error_panic_hook = "0.1.6"

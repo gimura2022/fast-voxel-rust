@@ -83,6 +83,8 @@ class Node:
         return ()
 
     def compile(self, pos):
+        emm_color = random.randint(0, 1) / 2
+
         if self.is_leaf:
             data.append({
                 "pos": pos,
@@ -93,7 +95,7 @@ class Node:
                 ],
                 "size": self.size,
                 "material": {
-                    "emmitance": [random.random(), random.random(), random.random()],
+                    "emmitance": [emm_color, emm_color, emm_color],
                     "reflectance": [random.random(), random.random(), random.random()],
                     "roughness": 0.0,
                     "opacity": 0.0
@@ -102,7 +104,7 @@ class Node:
                     0, 0, 0, 0, 0, 0, 0, 0
                 ],
                 "is_leaf": 1,
-                "is_none": int(not self.is_none)
+                "is_none": 0
             })
 
             return len(data) - 1

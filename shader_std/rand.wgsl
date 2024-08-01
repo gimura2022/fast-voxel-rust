@@ -3,31 +3,36 @@
 
 //! include "std" "header.wgsl"
 
-var<private> seed: f32 = 8498201.443902;
+var<private> rand_state: vec4<u32>;
 
-fn _rand(co: vec2<f32>) -> f32 {
-    return fract(sin(dot(co.xy, vec2<f32>(12.9898, 78.233))) * 43758.5453);
+fn taus_step(z: u32, s1: u32, s2: u32, s3: u32, m: u32) -> u32 {
+    let b = (((z << s1) ^ z) >> s2);
+    return (((z & m) << s3) ^ b);
 }
 
-fn rand(_co: vec2<f32>) -> f32 {
-    let r = _rand(_co * f32(seed));
-
-    let seed_f = r * 12.774;
-    seed = seed_f;
-
-    return r;
+fn lcg_step(z: u32, a: u32, c: u32) -> u32 {
+    return (a * z + c);
 }
 
-fn rand2(_co: vec2<f32>) -> vec2<f32> {
-    return vec2<f32>(rand(_co), rand(_co));
+fn rand() -> f32 {
+    rand_state.x = taus_step(rand_state.x, u32(13), u32(19), u32(12), u32(4294967294));
+    rand_state.y = taus_step(rand_state.y, u32(2), u32(25), u32(4), u32(4294967288));
+    rand_state.z = taus_step(rand_state.z, u32(3), u32(11), u32(17), u32(4294967280));
+    rand_state.w = lcg_step(rand_state.w, u32(1664525), u32(1013904223));
+
+    return 2.3283064365387e-10 * f32((rand_state.x ^ rand_state.y ^ rand_state.z ^ rand_state.w));
 }
 
-fn rand3(_co: vec2<f32>) -> vec3<f32> {
-    return vec3<f32>(rand(_co), rand(_co), rand(_co));
+fn rand2() -> vec2<f32> {
+    return vec2<f32>(rand(), rand());
 }
 
-fn rand4(_co: vec2<f32>) -> vec4<f32> {
-    return vec4<f32>(rand(_co), rand(_co), rand(_co), rand(_co));
+fn rand3() -> vec3<f32> {
+    return vec3<f32>(rand(), rand(), rand());
+}
+
+fn rand4() -> vec4<f32> {
+    return vec4<f32>(rand(), rand(), rand(), rand());
 }
 
 //! endif
